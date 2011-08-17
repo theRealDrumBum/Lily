@@ -7,6 +7,7 @@ abstract class Lily_Queue_Job_Abstract {
     protected $_id;
     protected $_payload;
     protected $_is_enqueued = false;
+    protected $_stats;
     
     /**
      * constructor
@@ -17,6 +18,7 @@ abstract class Lily_Queue_Job_Abstract {
         if (!isset($options['name'])) {
             throw new Lily_Config_Exception("queue.role.$role.name");
         }
+        $this->_stats = new Lily_Queue_Job_Stats($this);
         $this->_queue = Lily_Queue_Manager::getAdapter($options['name']);
         $this->_payload = $payload;
     }

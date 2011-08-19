@@ -7,7 +7,7 @@ abstract class Lily_Queue_Job_Abstract {
     protected $_id;
     protected $_payload;
     protected $_is_enqueued = false;
-    protected $_stats;
+    public $stats;
     
     /**
      * constructor
@@ -18,7 +18,7 @@ abstract class Lily_Queue_Job_Abstract {
         if (!isset($options['name'])) {
             throw new Lily_Config_Exception("queue.role.$role.name");
         }
-        $this->_stats = new Lily_Queue_Job_Stats($this);
+        $this->stats = new Lily_Queue_Job_Stats($this);
         $this->_queue = Lily_Queue_Manager::getAdapter($options['name']);
         $this->_payload = $payload;
     }
@@ -44,17 +44,6 @@ abstract class Lily_Queue_Job_Abstract {
     }
     
     /**
-     * Check if the job has attempts left to be run.
-     * @return bool
-     */
-    public function hasAttemptsLeft() {
-        if ($this->_attempts < $this->_max_attempts) {
-            return true;
-        }
-        return false;
-    }
-    
-    /**
      * This is the meat of job. This will be defined per
      * each job and is what it should do when it's pulled off
      * by a worker. 
@@ -68,7 +57,7 @@ abstract class Lily_Queue_Job_Abstract {
      * @return $this
      */
     public function setAttempts($num) {
-        $this->_attempts = $num;
+        $this->_attempts = (int)$num;
         return $this;
     }
     
@@ -76,9 +65,9 @@ abstract class Lily_Queue_Job_Abstract {
      * Get attempts.
      * @return int $this->_max_attempts
      */
-     public function getAttempts() {
-         return $this->_attempts;
-     }
+    public function getAttempts() {
+        return (int)$this->_attempts;
+    }
     
     /**
      * Set max attempts.
@@ -86,7 +75,7 @@ abstract class Lily_Queue_Job_Abstract {
      * @return $this
      */
     public function setMaxAttempts($num) {
-        $this->_max_attempts = $num;
+        $this->_max_attempts = (int)$num;
         return $this;
     }
     
@@ -95,8 +84,27 @@ abstract class Lily_Queue_Job_Abstract {
      * @return int $this->_max_attempts
      */
      public function getMaxAttempts() {
-         return $this->_max_attempts;
+         return (int)$this->_max_attempts;
      }
+    
+    /**
+     * Check if the job has attempts left to be run.
+     * @return bool
+     */
+    public function hasAttemptsLeft() {
+        if ($this->_attempts < $this->_max_attempts) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Get how many attempts are left for this job.
+     * @return int
+     */
+    public function getAttemptsLeft() {
+        return (int)($this->_max_attempts - $this->_attempts);
+    }
     
     /**
      * Set the unique id for the job.

@@ -3,10 +3,9 @@
 class Lily_Queue_Job_Stats {
     protected $_start_time = 0;
     protected $_end_time = 0;
-    protected $_attempts_left = 0;
     protected $_job;
     
-    public function __construct(Lily_Queue_Job& $job) {
+    public function __construct(Lily_Queue_Job_Abstract& $job) {
         $this->_job = $job;
     }
     
@@ -15,10 +14,13 @@ class Lily_Queue_Job_Stats {
      * @return array
      */
     public function __toArray() {
-        
+        return array(
+            'start_time' => $this->_start_time,
+            'end_time' => $this->_end_time,
+            'elapsed_time' => $this->getElapsedTime(),
+            'attempts_left' => $job->getAttemptsLeft()
+        );
     }
-    
-    
     
     /**
      * Set the start time (time()).
@@ -56,9 +58,10 @@ class Lily_Queue_Job_Stats {
     
     /**
      * Get time elapsed.
+     * @param int $precision
      * @return string
      */
-    public function getElapsedTime() {
-        return round($this->_end_time - $this->_start_time, 5);
+    public function getElapsedTime($precision=5) {
+        return round($this->_end_time - $this->_start_time, $precision);
     }
 }

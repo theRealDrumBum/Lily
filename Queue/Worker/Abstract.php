@@ -5,6 +5,8 @@ abstract class Lily_Queue_Worker_Abstract {
     protected $_sleep_duration = 3;
     protected $_stats;
     
+    // const REENQUEUE_TRIES = 3;
+    
     /**
      * Constructor
      * @param array $options
@@ -35,7 +37,7 @@ abstract class Lily_Queue_Worker_Abstract {
             $job = $this->_queue->pop();
             
             if (is_null($job)) {
-                Lily_Log::write('tadpole', "[$queue_name] No items in queue, sleeping...");
+                Lily_Log::write('tadpole', "[$queue_name] Empty queue, sleeping...");
                 $this->_stats->incSleeps();
                 sleep($this->_sleep_duration);
                 continue;
@@ -44,25 +46,42 @@ abstract class Lily_Queue_Worker_Abstract {
             $id = $job->getId();
             
             if (!$job->hasAttemptsLeft()) {
-                Lily_Log::write('tadpole', "[$queue_name] Job (#{$id}) has exceeded max_attempts.");
+                Lily_Log::write('tadpole', "[$queue_name] Job #{$id} has exceeded max_attempts.");
                 $this->_stats->incSleeps();
                 continue;
             }
             
             try {
+                $job->stats->setStartTime();
+                
                 if ($job->perform()) {
+                    $job->stats->setEndTime();
                     $this->_stats->incJobsCompleted();
-                    Lily_Log::write('tadpole', "[$queue_name] Job (#{$id}) completed.");
+                    $attempts_left = $job->getAttemptsLeft();
+                    $elapsed_time = $job->stats->getElapsedTime(0);
+                    Lily_Log::write('tadpole', "[$queue_name] Job #{$id} completed in $elapsed_time secs with $attempts_left attempts left.");
                 } else {
                     // Put it back on the queue
                     $job->enqueue();
                     $this->_stats->incJobsFailed();
-                    Lily_Log::write('tadpole', "[$queue_name] Job (#{$id}) failed, re-enqueueing.");
+                    $attempts_left = $job->getAttemptsLeft();
+                    Lily_Log::write('tadpole', "[$queue_name] Job #{$id} failed. $attempts_left attempts left.");
                 }
             } catch (Exception $e) {
+                // do {
+                //     $result = false;
+                //     try {
+                //         $result = $job->enqueue();
+                //     } catch (Exception $e) {
+                //         continue;
+                //     }
+                //     if (!$result) {
+                //         usleep(200);
+                //     }
+                // } while (!$result);
                 $job->enqueue();
                 $this->_stats->incJobsFailed();
-                Lily_Log::write('tadpole', "[$queue_name] Worker failed with error: " . $e->getMessage());
+                Lily_Log::write('tadpole', "[$queue_name] Job #{$id} failed with error: " . $e->getMessage());
             }
         }
         

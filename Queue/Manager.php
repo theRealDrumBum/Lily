@@ -4,8 +4,6 @@ class Lily_Queue_Manager {
     private static $_instance;
     private $_role_config;
     private $_adapters = array();
-    private $_workers = array();
-    private $_jobs = array();
     
     /**
      * Construct
@@ -122,7 +120,6 @@ class Lily_Queue_Manager {
 			throw new Lily_Queue_Exception("Class not found for specified worker, {$options['worker']}");
 		}
 
-        self::$_instance->_workers[$role][] = $worker;
         return $worker;
     }
     
@@ -159,7 +156,6 @@ class Lily_Queue_Manager {
 			throw new Lily_Queue_Exception("Class not found for specified job, {$options['job']}");
 		}
 
-        self::$_instance->_jobs[$role][] = $job;
         return $job;
     }
     

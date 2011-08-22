@@ -1,49 +1,40 @@
 <?php
 
-class Lily_Queue_Adapter_Tadpole extends Lily_Queue_Adapter_Abstract {
+abstract class Lily_Queue_Adapter_Tadpole_Abstract
+extends Lily_Queue_Adapter_Abstract {
     protected $_connection;
-    protected $_host;
-    protected $_port;
     protected $_format = 'json';
     protected $_valid_formats = array('json', 'serialize');
     
     /**
      * Constructor
-     * @param array $options 
+     * @param array $config 
      */
-    public function __construct($options=array()) {
-        parent::__construct($options);
+    public function __construct($config=array()) {
+        parent::__construct($config);
         
-        if (isset($options['format'])) {
-            if ($this->_isValidFormat($options['format'])) {
-                $this->_format = $options['format'];
+        if (isset($config['format'])) {
+            if ($this->_isValidFormat($config['format'])) {
+                $this->_format = $config['format'];
             } else {
-                throw new Lily_Queue_Exception("queue.role.{$options['name']}.format is invalid");
+                throw new Lily_Queue_Exception("queue.role.{$config['name']}.format is invalid");
             }
         }
         
-        $hosts = explode(',', $options['host']);
-        $hosts_count = count($hosts);        
-        $con = new Memcache;
-        
-        $i = 0;
-        $max_tries = 3;
-        do {
-            $i++;
-            $host = $hosts[rand() % $hosts_count];
-            if ($con->connect($host, $options['port'], $this->_connection_timeout)) {
-                $this->_connection = $con;
-                // These are really for inspection of the object state
-                // you can see which host:port was chosen
-                $this->_host = $host;
-                $this->_port = $options['port'];
-            } else {
-                if ($i >= $max_tries) {
-                    throw new Lily_Queue_Exception("Oouch! Can't connect to Tadpole.");
-                }
-            }
-        } while (is_null($this->_connection));
+        if (null === ($con = $this->_connect($config))) {
+            throw new Lily_Queue_Exception("Oouch! Can't connect to Tadpole");
+        } else {
+            $this->_connection = $con;
+        }
     }
+    
+    /**
+     * Define how to connect to tadpole.
+     * @throws Lily_Queue_Exception
+     * @param $config
+     * @author Tyler
+     */
+    abstract protected function _connect($config);
     
     /**
      * push

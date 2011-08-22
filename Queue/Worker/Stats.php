@@ -5,6 +5,7 @@ class Lily_Queue_Worker_Stats {
     protected $_jobs_failed = 0;
     protected $_loops = 0;
     protected $_sleeps = 0;
+    protected $_enqueue_fails = 0;
     protected $_start_time = 0;
     protected $_end_time = 0;
     
@@ -18,6 +19,7 @@ class Lily_Queue_Worker_Stats {
             'jobs_failed' => $this->_jobs_failed,
             'loops' => $this->_loops,
             'sleeps' => $this->_sleeps,
+            'enqueue_fails' => $this->_enqueue_fails,
             'start_time' => $this->_start_time,
             'end_time' => $this->_end_time
         );
@@ -85,6 +87,22 @@ class Lily_Queue_Worker_Stats {
      */
     public function getSleeps() {
         return $this->_sleeps;
+    }
+    
+    /**
+     * Increment enqueue fails.
+     * @return string
+     */
+    public function incEnqueueFails() {
+        return ++$this->_enqueueFails;
+    }
+    
+    /**
+     * Get enqueue fails.
+     * @return string
+     */
+    public function getEnqueueFails() {
+        return $this->_enqueueFails;
     }
     
     /**

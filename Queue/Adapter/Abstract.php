@@ -6,16 +6,16 @@ abstract class Lily_Queue_Adapter_Abstract {
     
     /**
      * Constructor
-     * @param array $options 
+     * @param array $config 
      */
-    public function __construct($options=array()) {
-        if (isset($options['name'])) {
-            $this->_queue_name = $options['name'];
+    public function __construct($config=array()) {
+        if (isset($config['name'])) {
+            $this->_queue_name = $config['name'];
         } else {
             throw new Lily_Queue_Exception('Adapter must have a name');
         }
-        if (isset($options['timeout'])) {
-            $this->_connection_timeout = $options['timeout'];
+        if (isset($config['timeout'])) {
+            $this->_connection_timeout = $config['timeout'];
         }
     }
     

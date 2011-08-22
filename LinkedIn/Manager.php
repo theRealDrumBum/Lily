@@ -29,6 +29,8 @@ class Lily_LinkedIn_Manager
 		if (!isset($options['appsecret'])) {
 			throw new Lily_Config_Exception("linkedin.appsecret");
 		}
+		
+		$this->appkey = $options['appkey'];
 		$this->appsecret = $options['appsecret'];
 		self::$instance = $this;
 	}
@@ -49,6 +51,14 @@ class Lily_LinkedIn_Manager
 		$linkedin = new LinkedIn($options);
 		$wrapper = new Lily_LinkedIn_Wrapper($linkedin);
 		return $wrapper;
+	}
+
+	public static function getAppKey() {
+		return self::$instance->appkey;
+	}
+	
+	public static function getAppSecret() {
+		return self::$instance->appsecret;
 	}
 	
 }

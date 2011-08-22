@@ -207,4 +207,78 @@ class Lily_Database_Adapter_MySQL
 		$query = "INSERT IGNORE INTO {$table} (" . implode(',', $columns) . ") VALUES " . implode(',', $values);
 		return $query;
 	}
+
+	public function buildUpdateQuery($table, $schema, $rows, $fieldId = 'id')
+	{
+		if (empty($table)) throw new Lily_Database_Exception("table is empty");
+		if (empty($schema)) throw new Lily_Database_Exception("schemas is empty");
+		if (empty($rows)) throw new Lily_Database_Exception("data is empty");
+		$conn = $this->getConnection();
+		$first_row = reset($rows);
+		ksort($first_row);
+		
+		$temp = array();
+		$temp_fieldid = array();
+		$columns = array();
+		foreach ($first_row as $column => $value) {
+			// if (!isset($schema[$column])) {
+				// throw new Lily_Database_Exception("unknown column `$column` provided");
+			// }
+			if (isset($schema[$column])) {
+				if($column == $fieldId) 
+					$temp_fieldid[] = $fieldId.'=%d';
+				else
+					switch ($schema[$column]) {
+						case 'int':
+							$temp[] = $column.'=%d';
+							break;
+						default:
+							$temp[] = $column.'="%s"';
+							break;
+					}
+			}	
+				$columns[] = $column;
+		}
+		
+		$format =  implode(',', $temp);
+		$values = array();
+		$result_fieldid = array();
+		foreach ($rows as $row) {
+			ksort($row);
+			$temp = array($format);
+			foreach ($row as $column => $value) {
+				 
+				// if (isset($schema[$column])) {
+					// throw new Lily_Database_Exception("unknown column `$column` provided");
+				// }
+				if($column == $fieldId)
+					$temp_fieldid[] = $this->escapeInt($value);
+				
+				else
+					switch ($schema[$column]) {
+						case 'int':
+							$temp[] = $this->escapeInt($value);
+							break;
+						default:
+							$temp[] = $this->escapeString($value);
+							break;
+					}
+			}
+			
+			$result = call_user_func_array('sprintf', $temp);
+			$result_fieldid = call_user_func_array('sprintf', $temp_fieldid);
+			$values[] = $result;
+			$values_fieldid[] = $result_fieldid;
+		}
+
+		$query = "UPDATE {$table} SET " . implode(',', $values). " WHERE ". implode(',', $values_fieldid);
+		
+		return $query;
+	}
+	
+	public function buildDeleteQuery($id, $fieldid='id') {
+		
+		$query = sprintf("DELETE FROM {$table} WHERE ".$fieldid." =  %d", $id);
+		return $query;
+	}
 }

@@ -44,4 +44,13 @@ class Lily_Data_Model_Cookie
 	public function getDirectory() {
 		return $this->_dir;
 	}
+
+	public function setDomain($domain) {
+		$this->_domain = $domain;
+		return $this;
+	}
+	
+	public function getDomain() {
+		return $this->_domain;
+	}
 }

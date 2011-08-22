@@ -37,12 +37,18 @@ class Lily_Controller_Action
     }
     
     protected function setCookie($cookie_name, $value, $ttl, $dir='/', $domain=null) {
-    	$this->_response->setCookie($cookie_name, $value, $ttl, $dir, $domain);
+		$cookie = new Lily_Data_Model_Cookie();
+		$cookie->setName($cookie_name)
+			->setValue($value)
+			->setTTL($ttl)
+			->setDirectory($dir)
+			->setDomain($domain);
+		$this->_response->setCookieObject($cookie);
     }
     
 	protected function setCookies(array $cookies) {
-		foreach ($this->cookies as $cookie) {
-			if ($cookie instanceof Lily_Data_Model_Cookie) {
+		foreach ($cookies as $cookie) {
+			if (! $cookie instanceof Lily_Data_Model_Cookie) {
 				throw new Lily_Controller_Exception("Specified cookie is not an instance of Lily_Data_Model_Cookie");
 			}
 			$this->_response->setCookieObject($cookie);

@@ -48,6 +48,14 @@ class Lily_Application {
 				case 'facebook' :
 					$manager = new Lily_Facebook_Manager($payload);
 					break;
+				
+				case 'linkedin' :
+					$manager = new Lily_LinkedIn_Manager($payload);
+					break;
+				
+				case 'indeed' :
+					$manager = new Lily_Indeed_Manager($payload);
+					break;
 					 
 				case 'jsonrpc' :
 					$manager = new Lily_Jsonrpc_Manager($payload);
@@ -87,10 +95,6 @@ class Lily_Application {
 				case 'xmlrpc' :
 					$manager = new Lily_Xmlrpc_Manager($payload);
 					break;
-				
-				case 'queue' :
-				    $manager = new Lily_Queue_Manager($payload);
-				    break;
 					
 				default: break;
 			}

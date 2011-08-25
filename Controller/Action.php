@@ -46,7 +46,7 @@ class Lily_Controller_Action
 		$this->_response->setCookieObject($cookie);
     }
     
-	protected function addCookie(Lily_Dat_Model_Cookie $cookie) {
+	protected function addCookie(Lily_Data_Model_Cookie $cookie) {
 		$this->_response->setCookieObject($cookie);
 		return $this;
 	}

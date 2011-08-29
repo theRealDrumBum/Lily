@@ -8,5 +8,11 @@ Version 1 Goals
     - Create basic application framework
     - Create basic Controller / Dispatcher
     - Create routes for controller / dispatcher
+    
+Version 2 Goals
+	- Integrate abstraction layers for thrift in the Gateway(Mapper) / Model pattern
+	- Integrate additional social connection apis
+	- Integrate RPC layer for either JSON or XML
+	
 
 
